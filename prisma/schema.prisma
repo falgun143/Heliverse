@@ -1,0 +1,46 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql" // or "mysql" depending on your database
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id          String      @id @default(uuid())
+  email       String      @unique
+  password    String
+  role        Role
+  // classrooms  Classroom[] 
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt
+}
+
+// model Classroom {
+//   id          Int         @id @default(autoincrement())
+//   name        String
+//   startTime   DateTime
+//   endTime     DateTime
+//   days        String      // Store days as a comma-separated string, e.g., "Monday,Tuesday,Wednesday"
+//   createdAt   DateTime    @default(now())
+//   updatedAt   DateTime    @updatedAt
+//   teacherId   String?     // Nullable because not all classrooms might have a teacher assigned
+//   teacher     User?       @relation( fields: [teacherId], references: [id])
+//   students    User[]      @relation("StudentClassrooms")
+//   timetable   Timetable[]
+// }
+
+// model Timetable {
+//   id          Int         @id @default(autoincrement())
+//   subject     String
+//   startTime   DateTime
+//   endTime     DateTime
+//   classroom   Classroom   @relation(fields: [classroomId], references: [id])
+//   classroomId Int
+// }
+
+enum Role {
+  TEACHER
+  STUDENT
+}
