@@ -23,7 +23,7 @@ import Cookies from "js-cookie";
 import { useLogin } from "../context/LoginContext";
 import "react-toastify/dist/ReactToastify.css";
 import { useRouter } from "next/navigation";
-
+import CustomButton from "./CustomButton";
 export const drawerWidth = 240;
 
 interface Props {
@@ -63,7 +63,12 @@ export default function AppBar(
       <Divider />
       <List>
         <ListItem key={"Home"} disablePadding>
-          <ListItemButton onClick={() => router.push("/")}>
+          <ListItemButton
+            onClick={() => {
+              handleDrawerClose();
+              router.push("/");
+            }}
+          >
             <ListItemIcon>
               <AiFillHome />
             </ListItemIcon>
@@ -72,7 +77,12 @@ export default function AppBar(
         </ListItem>
 
         <ListItem key={"CreateClass"} disablePadding>
-          <ListItemButton onClick={() => router.push("/addclass")}>
+          <ListItemButton
+            onClick={() => {
+              handleDrawerClose();
+              router.push("/addclass");
+            }}
+          >
             <ListItemIcon>
               <SiGoogleclassroom />
             </ListItemIcon>
@@ -87,6 +97,49 @@ export default function AppBar(
             </ListItemIcon>
             <ListItemText primary={"ViewClasses"} />
           </ListItemButton>
+        </ListItem>
+
+        <ListItem>
+          <Box
+            sx={{
+              display: { xs: "flex", sm: "none" },
+              flexDirection: "column",
+              alignItems: "center",
+              gap: 2,
+            }}
+          >
+            {login && (role == "PRINCIPAL" || "TEACHER") && (
+              <CustomButton
+                text=" Register"
+                onClick={() => {
+                  handleDrawerClose();
+                  router.push("/signup");
+                }}
+              ></CustomButton>
+            )}
+
+            {login && (
+              <CustomButton
+                text=" Logout"
+                onClick={() => {
+                  handleDrawerClose();
+                  setLogin(false);
+                  Cookies.remove("token");
+                  router.push("/")
+                }}
+              />
+            )}
+
+            {!login && (
+              <CustomButton
+                text="Login"
+                onClick={() => {
+                  handleDrawerClose();
+                  router.push("/login");
+                }}
+              ></CustomButton>
+            )}
+          </Box>
         </ListItem>
       </List>
     </div>
@@ -116,6 +169,7 @@ export default function AppBar(
                 xs: "space-between",
                 sm: "right",
               },
+              padding: 5,
             }}
           >
             <IconButton
@@ -128,42 +182,44 @@ export default function AppBar(
               <MenuIcon />
             </IconButton>
 
-            {role == "PRINCIPAL" && (
-              <Button
-                variant="contained"
-                style={{ borderRadius: 17, marginRight: 5 }}
-                onClick={() => {
-                  router.push("/signup");
-                }}
-              >
-                Register
-              </Button>
-            )}
+            <Box
+              sx={{
+                display: {
+                  xs: "none",
+                  sm: "flex",
+                },
+                gap:2
+              }}
+            >
+              {login && (role == "PRINCIPAL" || "TEACHER") && (
+                <CustomButton
+                  text="Register"
+                  onClick={() => {
+                    router.push("/signup");
+                  }}
+                ></CustomButton>
+              )}
 
-            {login && (
-              <Button
-                variant="contained"
-                style={{ borderRadius: 17 }}
-                onClick={() => {
-                  setLogin(false);
-                  Cookies.remove("token")
-                }}
-              >
-                Logout
-              </Button>
-            )}
+              {login && (
+                <CustomButton
+                  text="  Logout"
+                  onClick={() => {
+                    setLogin(false);
+                    Cookies.remove("token");
+                    router.push("/")
+                  }}
+                ></CustomButton>
+              )}
 
-            {!login && (
-              <Button
-                variant="contained"
-                style={{ borderRadius: 17 }}
-                onClick={() => {
-                  router.push("/login");
-                }}
-              >
-                Login
-              </Button>
-            )}
+              {!login && (
+                <CustomButton
+                  text=" Login"
+                  onClick={() => {
+                    router.push("/login");
+                  }}
+                ></CustomButton>
+              )}
+            </Box>
           </Toolbar>
         </MuiAppBar>
 
@@ -210,9 +266,10 @@ export default function AppBar(
           component="main"
           sx={{
             flexGrow: 1,
-            p: 3,
+            pt: 7,
             width: { sm: `calc(100% - ${drawerWidth}px)` },
           }}
+          style={{ overflowX: "auto" }}
         >
           <Toolbar />
           {children}
@@ -221,113 +278,3 @@ export default function AppBar(
     </>
   );
 }
-
-// const Appbar = ({ children }: { children: React.ReactNode }) => {
-//   const router = useRouter();
-//   const { login, setLogin, role } = useLogin();
-
-//   const handleLogout = () => {
-//     Cookies.remove("token");
-//     setLogin(false);
-//     router.push("/");
-//   };
-
-//   return (
-//     <>
-//       <MuiAppBar position="static" style={{ backgroundColor: "#34c300" }}>
-//         <Box
-//           sx={{
-//             display: "flex",
-//             justifyContent: "space-between",
-//             width: "100%",
-//             marginTop: 2,
-//             padding: 2,
-//             flexDirection: {
-//               xs: "column",
-//               md: "row",
-//               lg: "row",
-//             },
-//             gap:5
-//           }}
-//         >
-//           <Typography
-//             variant="h5"
-//             sx={{ cursor: "pointer", marginLeft: 2 }}
-//             onClick={() => {
-//               router.push("/");
-//             }}
-//           >
-//             HOME
-//           </Typography>
-//           <Box
-//             sx={{
-//               display: "flex",
-//               gap: 2,
-//               marginRight: 10,
-//               flexDirection: {
-//                 xs: "column",
-//                 md: "row",
-//                 lg: "row",
-//               },
-//             }}
-//           >
-//             {login ? (
-//               <>
-//                 <Button
-//                   variant="contained"
-//                   onClick={handleLogout}
-
-//                 >
-//                   Logout
-//                 </Button>
-
-//                 {role === "PRINCIPAL" && (
-//                   <Button
-
-//                     variant="contained"
-//                     onClick={() => {
-//                       router.push("/addcar");
-//                     }}
-//                   >
-//                     CreateClassRoom
-//                   </Button>
-//                 )}
-
-//                 <Button
-//                   variant="contained"
-//                   onClick={() => {
-//                     router.push("/getcars");
-//                   }}
-
-//                 >
-//                   VIEWCL
-//                 </Button>
-//               </>
-//             ) : (
-//               <>
-//                 <Button
-//                   variant="contained"
-//                   onClick={() => {
-//                     router.push("/login");
-//                   }}
-
-//                 >
-//                   Login
-//                 </Button>
-
-//               </>
-//             )}
-//                <SuprSendInbox
-//          workspaceKey="irQ1EZbPcX87e9oZulrj"
-//       subscriberId="pIzG1VcpZ3dp3Ou1US8RKBvl1tS2OhclpWECzYOzNCU="
-//       distinctId="palfalgun@gmail.com"
-//       themeType="dark"
-
-//       />
-//           </Box>
-//         </Box>
-//       </MuiAppBar>
-//       {children}
-//     </>
-//   );
-// };

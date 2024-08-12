@@ -7,12 +7,12 @@ import { useRouter } from "next/navigation";
 import { useLogin } from "../../context/LoginContext";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-import { z } from "zod";
 import { decode_jwt } from "@falgunpal/jwt-helper-ts";
 import { LoginSchema } from "@/utils/validationSchema";
+import CustomButton from "@/components/CustomButton";
 
 const Login = () => {
-  const [email,setEmail] = useState("");
+  const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [errors, setErrors] = useState<{ path: string; message: string }[]>([]);
   const router = useRouter();
@@ -21,12 +21,16 @@ const Login = () => {
   const validateField = (field: string, value: string) => {
     const result = LoginSchema.safeParse({ [field]: value });
     if (!result.success) {
-      return result.error.errors.find((err) => err.path.includes(field)) || null;
+      return (
+        result.error.errors.find((err) => err.path.includes(field)) || null
+      );
     }
     return null;
   };
 
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+  const handleInputChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+  ) => {
     const { name, value } = e.target;
     const error = validateField(name, value);
 
@@ -37,7 +41,7 @@ const Login = () => {
 
     // Update the state for the specific input field
     if (name === "email") {
-     setEmail(value);
+      setEmail(value);
     } else if (name === "password") {
       setPassword(value);
     }
@@ -98,7 +102,7 @@ const Login = () => {
         toast.success("Login Successful, redirecting...");
         setTimeout(() => {
           router.push("/getusers");
-        }, 3000);
+        }, 1500);
       }
     } catch (error: any) {
       if (error.response) {
@@ -106,14 +110,10 @@ const Login = () => {
 
         if (status === 401 || status === 404) {
           toast.error(data.message);
-          
-        }
-        else if (status === 405) {
+        } else if (status === 405) {
           console.log(error.response.data.errors);
           setErrors(error.response.data.errors);
-        }
-        
-        else {
+        } else {
           toast.error("An unexpected error occurred.");
         }
       } else {
@@ -124,7 +124,7 @@ const Login = () => {
 
   return (
     <>
-      <ToastContainer autoClose={3000} theme="dark" />
+      <ToastContainer autoClose={1500} theme="dark" />
 
       <form
         onSubmit={onSubmit}
@@ -138,7 +138,7 @@ const Login = () => {
         <Card
           sx={{
             width: {
-              xs: "90%",
+              xs: "100%",
               md: "40%",
             },
           }}
@@ -175,14 +175,11 @@ const Login = () => {
             error={errors.some((err) => err.path === "password")}
             helperText={errors.find((err) => err.path === "password")?.message}
           />
-          <Button
+          <CustomButton
             variant="contained"
-            style={{width: "30%",borderRadius: 17  }}
-            
             type="submit"
-          >
-            Login
-          </Button>
+            text="  Login"
+          ></CustomButton>
         </Card>
       </form>
     </>

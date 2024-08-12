@@ -18,14 +18,15 @@ import { useLogin } from "../../context/LoginContext";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { SignUpSchema } from "../../utils/validationSchema"; 
+import CustomButton from "@/components/CustomButton";
 
 const Signup = () => {
   const router = useRouter();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [role, setRole] = useState("");
+  const [Role, setRole] = useState("");
   const [errors, setErrors] = useState<{ path: string; message: string }[]>([]);
-  const { setLogin, setrole } = useLogin();
+  const { role,setLogin } = useLogin();
 
   const validateField = (field: string, value: string) => {
     const result = SignUpSchema.safeParse({ [field]: value });
@@ -71,8 +72,9 @@ const Signup = () => {
   const onSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
 
-    // Validate the whole form
-    const result = SignUpSchema.safeParse({ email, password, role });
+    //Validate the whole form
+    const result = SignUpSchema.safeParse({ email, password, role:Role });
+    console.log(result.success)
     if (!result.success) {
       setErrors(
         result.error.errors.map((err) => ({
@@ -82,23 +84,23 @@ const Signup = () => {
       );
       return;
     }
-
+  
     try {
       const response = await axios.post("/api/signup", {
         email,
         password,
-        role,
+        role:Role,
       });
-
+      console.log(response)
       if (response.status === 200) {
         const token = response.data.token;
         Cookies.set("token", token);
         setLogin(true);
-        setrole(role);
+        setRole(Role);
         toast.success("User registered, redirecting...");
         setTimeout(() => {
           router.push("/getusers");
-        }, 3000);
+        }, 1500);
       }
     } catch (error: any) {
       if (error.response) {
@@ -118,7 +120,7 @@ const Signup = () => {
 
   return (
     <>
-      <ToastContainer autoClose={3000} theme="dark" />
+      <ToastContainer autoClose={1500} theme="dark" />
       <form onSubmit={onSubmit} style={{ display: "flex", justifyContent: "center", width: "100%" }}>
         <Card
           sx={{
@@ -146,8 +148,7 @@ const Signup = () => {
             required
             label="email"
             type="text"
-            fullWidth
-      
+            fullWidth 
             error={errors.some((err) => err.path === "email")}
             helperText={errors.find((err) => err.path === "email")?.message}
           />
@@ -164,29 +165,38 @@ const Signup = () => {
             helperText={errors.find((err) => err.path === "password")?.message}
           />
           <FormControl fullWidth>
-            <InputLabel id="role" color="success">
+            <InputLabel id="Role">
               Role
             </InputLabel>
             <Select
-              labelId="role"
-              id="role"
+              labelId="Role"
+              id="Role"
               required
               label="Role"
-              value={role}
+              value={Role}
               onChange={(e) => setRole(e.target.value as string)}
-             
+
             >
-              <MenuItem value={"STUDENT"}>STUDENT</MenuItem>
-              <MenuItem value={"TEACHER"}>TEACHER</MenuItem>
+              {(role=="TEACHER"||role=="PRINCIPAL")&&(
+             <MenuItem value={"STUDENT"}>STUDENT</MenuItem>
+              )}
+
+              {(role=="PRINCIPAL")&&(
+                <MenuItem value={"TEACHER"}>TEACHER</MenuItem>
+              )}
+             
+              
             </Select>
           </FormControl>
-          <Button
-            variant="contained"
-            style={{ width: "30%",borderRadius: 17 }}
-            type="submit"
+          <CustomButton
+           type="submit"
+           text="Register"
+           onClick={()=>{
+            console.log("Clicked")
+           }}
           >
-            Register
-          </Button>
+           
+          </CustomButton>
         </Card>
       </form>
     </>

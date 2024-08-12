@@ -16,6 +16,7 @@ import Cookies from "js-cookie";
 import { decode_jwt } from "@falgunpal/jwt-helper-ts";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import CustomButton from "@/components/CustomButton";
 
 export type Car = {
   id: number;
@@ -45,7 +46,7 @@ const Cars = () => {
       try {
         const response = await fetch("/api/getcars", {
           next: {
-            tags: ['cars'], 
+            tags: ["cars"],
           },
         });
         const data = await response.json();
@@ -102,13 +103,11 @@ const Cars = () => {
         <Typography variant="body1" sx={{ mb: 4, color: "#666" }}>
           Please log in to view the available cars.
         </Typography>
-        <Button
+        <CustomButton
           variant="contained"
-          style={{ backgroundColor: "#36cc00" }}
+          text=" Go to Login"
           onClick={() => (window.location.href = "/login")}
-        >
-          Go to Login
-        </Button>
+        ></CustomButton>
       </Box>
     );
   }
@@ -137,7 +136,7 @@ const Cars = () => {
 
   return (
     <>
-      <ToastContainer  autoClose={1000}  theme="dark" />
+      <ToastContainer autoClose={1000} theme="dark" />
       <Box sx={{ padding: 4 }}>
         <Typography variant="h4" sx={{ mb: 4, color: "#2ba000" }}>
           Car Dashboard

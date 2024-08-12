@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { PrismaClient } from '@prisma/client';
+import bcrypt from "bcrypt";
 
 const prisma = new PrismaClient();
 
@@ -14,12 +15,13 @@ export async function PUT(request: NextRequest) {
 
   // Parse JSON body
   const { email, password} = await request.json();
+  const hashedPassword = await bcrypt.hash(password, 10);
 
   try {
     // Update the car record
     const updateduser = await prisma.user.update({
       where: { id },
-      data: { email,password }
+      data: { email,password:hashedPassword }
     });
 
   

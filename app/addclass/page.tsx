@@ -1,6 +1,6 @@
 "use client";
 import React, { useState, useEffect } from "react";
-import { Button, Card, TextField, Typography, Box } from "@mui/material";
+import { Card, TextField, Typography, Box } from "@mui/material";
 import { decode_jwt } from "@falgunpal/jwt-helper-ts";
 import Cookies from "js-cookie";
 import axios from "axios";
@@ -12,6 +12,8 @@ import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import dayjs from "dayjs";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import CustomButton from "@/components/CustomButton";
+import { Autocomplete } from "@mui/material";
 
 const CreateClassRoom = () => {
   const { login, role } = useLogin();
@@ -19,8 +21,30 @@ const CreateClassRoom = () => {
   const [days, setDays] = useState<string[]>([]);
   const [startTime, setStartTime] = useState(dayjs().hour(12).minute(0));
   const [endTime, setEndTime] = useState(dayjs().hour(18).minute(0));
+  const [teachers, setTeachers] = useState<string[]>([]);
+  const [allStudents, setAllStudents] = useState<string[]>([]);
+  const [students, setStudents] = useState<string[]>([]);
+  const [selectedTeacher, setSelectedTeacher] = useState<string | null>(null);
 
   const router = useRouter();
+
+  useEffect(() => {
+    if (login) {
+      fetchUsers();
+    }
+  }, []);
+
+  const fetchUsers = async () => {
+    try {
+      const response = await axios.get("/api/getusers");
+
+
+      setTeachers(  response.data.users.filter((user: any) => user.role === "TEACHER").map((user:any)=>user.email));
+      setAllStudents(response.data.users.filter((user: any) => user.role === "STUDENT").map((user:any)=>user.email));
+    } catch (error) {
+      console.error("Failed to fetch users:", error);
+    }
+  };
 
   const handleDayChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const selectedDay = event.target.value;
@@ -73,11 +97,12 @@ const CreateClassRoom = () => {
           Access Denied
         </Typography>
         <Typography variant="body1" sx={{ mb: 4, color: "#666" }}>
-          You do not have permission to access this page.
+          Only Principal Can Access this Page.
         </Typography>
-        <Button variant="contained"   style={{borderRadius:17}} onClick={() => router.push("/login")}>
-          Login
-        </Button>
+        <CustomButton
+          text="Login"
+          onClick={() => router.push("/login")}
+        ></CustomButton>
       </Box>
     );
   }
@@ -119,7 +144,30 @@ const CreateClassRoom = () => {
               onChange={(e) => setClassName(e.target.value)}
               fullWidth
             />
+            <Autocomplete
+              options={teachers}
+              getOptionLabel={(option) => option} 
+              value={selectedTeacher}
+              onChange={(event, newValue) => setSelectedTeacher(newValue)}
+              renderInput={(params) => (
+                <TextField {...params} label="Select Teacher" />
+              )}
+              fullWidth
+              sx={{ mt: 2 }}
+            />
 
+            <Autocomplete
+              multiple
+              options={allStudents}
+              getOptionLabel={(option) => option} 
+              value={students}
+              onChange={(event, newValue) => setStudents(newValue)}
+              renderInput={(params) => (
+                <TextField {...params} label="Select Students" />
+              )}
+              fullWidth
+              sx={{ mt: 2 }}
+            />
             <LocalizationProvider dateAdapter={AdapterDayjs}>
               <Grid container spacing={2}>
                 <Grid item xs={6}>
@@ -173,13 +221,17 @@ const CreateClassRoom = () => {
               ))}
             </Box>
 
-            <Button
+            <CustomButton
               variant="contained"
               type="submit"
-              style={{ marginTop: 2, width: "40%", borderRadius: 17 }}
-            >
-              Add Class
-            </Button>
+              text="Add Class"
+              style={{
+                width: 120,
+                borderRadius: 20,
+                backgroundColor: "#146fe6",
+                padding: 9,
+              }}
+            ></CustomButton>
           </Card>
         </form>
       </Box>
