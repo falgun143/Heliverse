@@ -2,7 +2,7 @@ import React from "react";
 import { Inter } from "next/font/google";
 import { LoginProvider } from "../context/LoginContext";
 import AppBar from "../components/Appbar";
-import { cookies } from "next/headers"; // Use this to access cookies
+import { cookies } from "next/headers"; 
 import { decode_jwt, validate_jwt } from "@falgunpal/jwt-helper-ts";
 
 const inter = Inter({ subsets: ["latin"] });

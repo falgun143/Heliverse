@@ -14,29 +14,13 @@ import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
 const CreateClassRoom = () => {
-  const { login } = useLogin();
+  const { login, role } = useLogin();
   const [classname, setClassName] = useState("");
   const [days, setDays] = useState<string[]>([]);
   const [startTime, setStartTime] = useState(dayjs().hour(12).minute(0));
   const [endTime, setEndTime] = useState(dayjs().hour(18).minute(0));
-  const [userRole, setUserRole] = useState<
-    "PRINCIPAL" | "TEACHER" | "STUDENT" | null
-  >(null);
-  const router = useRouter();
-  const isClient = true;
 
-  useEffect(() => {
-    if (login) {
-      const token = Cookies.get("token");
-      if (process.env.NEXT_PUBLIC_JWT_SECRET && token) {
-        const { payload } = decode_jwt(
-          process.env.NEXT_PUBLIC_JWT_SECRET,
-          token
-        );
-        setUserRole(payload.role);
-      }
-    }
-  }, [login]);
+  const router = useRouter();
 
   const handleDayChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const selectedDay = event.target.value;
@@ -49,10 +33,6 @@ const CreateClassRoom = () => {
 
   const handleAddClass = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (userRole !== "PRINCIPAL") {
-      toast.error("You are not authorized to add a class.");
-      return;
-    }
 
     try {
       const token = Cookies.get("token");
@@ -76,31 +56,31 @@ const CreateClassRoom = () => {
     }
   };
 
-  // if (!login || userRole !== "PRINCIPAL" || !isClient) {
-  //   return (
-  //     <Box
-  //       sx={{
-  //         display: "flex",
-  //         flexDirection: "column",
-  //         alignItems: "center",
-  //         justifyContent: "center",
-  //         height: "100vh",
-  //         backgroundColor: "#f5f5f5",
-  //         textAlign: "center",
-  //       }}
-  //     >
-  //       <Typography variant="h4" sx={{ mb: 2, color: "#333" }}>
-  //         Access Denied
-  //       </Typography>
-  //       <Typography variant="body1" sx={{ mb: 4, color: "#666" }}>
-  //         You do not have permission to access this page.
-  //       </Typography>
-  //       <Button variant="contained" onClick={() => router.push("/")}>
-  //         Go to Home
-  //       </Button>
-  //     </Box>
-  //   );
-  // }
+  if (!login || role !== "PRINCIPAL") {
+    return (
+      <Box
+        sx={{
+          display: "flex",
+          flexDirection: "column",
+          alignItems: "center",
+          justifyContent: "center",
+          height: "100vh",
+          backgroundColor: "#f5f5f5",
+          textAlign: "center",
+        }}
+      >
+        <Typography variant="h4" sx={{ mb: 2, color: "#333" }}>
+          Access Denied
+        </Typography>
+        <Typography variant="body1" sx={{ mb: 4, color: "#666" }}>
+          You do not have permission to access this page.
+        </Typography>
+        <Button variant="contained"   style={{borderRadius:17}} onClick={() => router.push("/login")}>
+          Login
+        </Button>
+      </Box>
+    );
+  }
 
   return (
     <>
@@ -138,7 +118,6 @@ const CreateClassRoom = () => {
               label="Class Name"
               onChange={(e) => setClassName(e.target.value)}
               fullWidth
-              color="success"
             />
 
             <LocalizationProvider dateAdapter={AdapterDayjs}>
@@ -187,7 +166,6 @@ const CreateClassRoom = () => {
                       value={day}
                       checked={days.includes(day)}
                       onChange={handleDayChange}
-                      color="success"
                     />
                   }
                   label={day}
@@ -198,7 +176,7 @@ const CreateClassRoom = () => {
             <Button
               variant="contained"
               type="submit"
-              style={{ marginTop: 2, backgroundColor: "#36cc00", width: "50%" }}
+              style={{ marginTop: 2, width: "40%", borderRadius: 17 }}
             >
               Add Class
             </Button>

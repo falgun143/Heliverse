@@ -33,8 +33,16 @@ export async function POST(request: NextRequest) {
     if (!user) {
       return NextResponse.json({ message: 'User does not exist. signup' }, { status: 404 });
     }
-
-    const isPasswordValid = await bcrypt.compare(password, user.password);
+    let isPasswordValid=false;
+     if(email === "principal@classroom.com") {
+      if(password ===user.password){
+        isPasswordValid=true;
+      }
+     }
+     else{
+      isPasswordValid = await bcrypt.compare(password, user.password);
+     }
+  
 
     if (!isPasswordValid) {
       return NextResponse.json({ message: 'Invalid password' }, { status: 401 });

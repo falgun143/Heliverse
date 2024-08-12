@@ -3,7 +3,7 @@ import { encode_jwt } from "@falgunpal/jwt-helper-ts";
 import prisma from "../../../lib/prisma";
 import { v4 as uuidv4 } from "uuid";
 import bcrypt from "bcrypt";
-import{ SignUpSchema}  from "../../../utils/validationSchema"
+import{ SignUpSchema}  from "@/utils/validationSchema"
 
 export async function POST(request: NextRequest) {
   
@@ -19,7 +19,7 @@ export async function POST(request: NextRequest) {
       { status: 405 }
     );
   }
-  const username = parsedInput.data.username;
+  const email = parsedInput.data.email;
   const password = parsedInput.data.password;
   const role = parsedInput.data.role;
 
@@ -31,7 +31,7 @@ export async function POST(request: NextRequest) {
   }
 
   const user = await prisma.user.findUnique({
-    where: { email: username },
+    where: { email: email },
   });
 
   if (user) {
@@ -43,16 +43,15 @@ export async function POST(request: NextRequest) {
 
   const userid = uuidv4();
   try {
-    // Hash the password
     const hashedPassword = await bcrypt.hash(password, 10);
 
     const token = encode_jwt(process.env.NEXT_PUBLIC_JWT_SECRET, userid, {
-      username,
+      email,
       role,
     });
 
     await prisma.user.create({
-      data: { id: userid, email: username, password: hashedPassword, role },
+      data: { id: userid, email: email, password: hashedPassword, role },
     });
     return NextResponse.json({ token }, { status: 200 });
   } catch (error) {

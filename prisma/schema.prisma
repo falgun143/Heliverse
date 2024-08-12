@@ -3,44 +3,43 @@ generator client {
 }
 
 datasource db {
-  provider = "postgresql" // or "mysql" depending on your database
+  provider = "postgresql" 
   url      = env("DATABASE_URL")
+   directUrl = env("DIRECT_URL")
 }
 
 model User {
-  id          String      @id @default(uuid())
+  id          String     @unique @id @default(uuid())
   email       String      @unique
   password    String
   role        Role
-  // classrooms  Classroom[] 
-  createdAt   DateTime    @default(now())
-  updatedAt   DateTime    @updatedAt
+  classrooms  Classroom[] @relation("StudentClassrooms")
+  classroomsAsTeacher Classroom? @relation("ClassroomTeacher")
 }
 
-// model Classroom {
-//   id          Int         @id @default(autoincrement())
-//   name        String
-//   startTime   DateTime
-//   endTime     DateTime
-//   days        String      // Store days as a comma-separated string, e.g., "Monday,Tuesday,Wednesday"
-//   createdAt   DateTime    @default(now())
-//   updatedAt   DateTime    @updatedAt
-//   teacherId   String?     // Nullable because not all classrooms might have a teacher assigned
-//   teacher     User?       @relation( fields: [teacherId], references: [id])
-//   students    User[]      @relation("StudentClassrooms")
-//   timetable   Timetable[]
-// }
+model Classroom {
+  id          Int         @id @default(autoincrement())
+  name        String
+  startTime   DateTime
+  endTime     DateTime
+  days        String[]    
+  teacherId   String    @unique
+  teacher     User      @relation("ClassroomTeacher", fields: [teacherId], references: [id])
+  students    User[]      @relation("StudentClassrooms")
+  timetable   Timetable[]
+}
 
-// model Timetable {
-//   id          Int         @id @default(autoincrement())
-//   subject     String
-//   startTime   DateTime
-//   endTime     DateTime
-//   classroom   Classroom   @relation(fields: [classroomId], references: [id])
-//   classroomId Int
-// }
+model Timetable {
+  id          Int         @id @default(autoincrement())
+  subject     String
+  startTime   DateTime
+  endTime     DateTime
+  classroom   Classroom   @relation(fields: [classroomId], references: [id])
+  classroomId Int
+}
 
 enum Role {
+  PRINCIPAL
   TEACHER
   STUDENT
 }

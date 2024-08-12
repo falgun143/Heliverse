@@ -9,11 +9,7 @@ import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { z } from "zod";
 import { decode_jwt } from "@falgunpal/jwt-helper-ts";
-
-const LoginSchema = z.object({
-  email: z.string().email({message:"Invalid Email"}),
-  password: z.string().min(5, { message: "Password must be at least 5 characters" }).max(10, { message: "Password must be maximum of 10 characters" }),
-});
+import { LoginSchema } from "@/utils/validationSchema";
 
 const Login = () => {
   const [email,setEmail] = useState("");
@@ -101,7 +97,7 @@ const Login = () => {
         setrole(role);
         toast.success("Login Successful, redirecting...");
         setTimeout(() => {
-          router.push("/getcars");
+          router.push("/getusers");
         }, 3000);
       }
     } catch (error: any) {
@@ -181,7 +177,8 @@ const Login = () => {
           />
           <Button
             variant="contained"
-            style={{ width: "50%" }}
+            style={{width: "30%",borderRadius: 17  }}
+            
             type="submit"
           >
             Login

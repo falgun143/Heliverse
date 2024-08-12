@@ -17,13 +17,13 @@ import { useRouter } from "next/navigation";
 import { useLogin } from "../../context/LoginContext";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-import { SignUpSchema } from "../../utils/validationSchema"; // Import the validation schema
+import { SignUpSchema } from "../../utils/validationSchema"; 
 
 const Signup = () => {
   const router = useRouter();
-  const [username, setUsername] = useState("");
+  const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [role, setRole] = useState("USER");
+  const [role, setRole] = useState("");
   const [errors, setErrors] = useState<{ path: string; message: string }[]>([]);
   const { setLogin, setrole } = useLogin();
 
@@ -44,8 +44,8 @@ const Signup = () => {
     );
 
     // Update the state for the specific input field
-    if (name === "username") {
-      setUsername(value);
+    if (name === "email") {
+      setEmail(value);
     } else if (name === "password") {
       setPassword(value);
     }
@@ -72,7 +72,7 @@ const Signup = () => {
     event.preventDefault();
 
     // Validate the whole form
-    const result = SignUpSchema.safeParse({ username, password, role });
+    const result = SignUpSchema.safeParse({ email, password, role });
     if (!result.success) {
       setErrors(
         result.error.errors.map((err) => ({
@@ -85,7 +85,7 @@ const Signup = () => {
 
     try {
       const response = await axios.post("/api/signup", {
-        username,
+        email,
         password,
         role,
       });
@@ -97,7 +97,7 @@ const Signup = () => {
         setrole(role);
         toast.success("User registered, redirecting...");
         setTimeout(() => {
-          router.push("/getcars");
+          router.push("/getusers");
         }, 3000);
       }
     } catch (error: any) {
@@ -124,7 +124,7 @@ const Signup = () => {
           sx={{
             width: {
               xs: "100%",
-              md: "30%",
+              md: "40%",
             },
           }}
           style={{
@@ -140,16 +140,16 @@ const Signup = () => {
             Welcome SignUp Below
           </Typography>
           <TextField
-            name="username"
-            value={username}
+            name="email"
+            value={email}
             onChange={handleInputChange}
             required
-            label="Username"
+            label="email"
             type="text"
             fullWidth
-            color="success"
-            error={errors.some((err) => err.path === "username")}
-            helperText={errors.find((err) => err.path === "username")?.message}
+      
+            error={errors.some((err) => err.path === "email")}
+            helperText={errors.find((err) => err.path === "email")?.message}
           />
           <TextField
             name="password"
@@ -159,7 +159,7 @@ const Signup = () => {
             label="Password"
             type="password"
             fullWidth
-            color="success"
+      
             error={errors.some((err) => err.path === "password")}
             helperText={errors.find((err) => err.path === "password")?.message}
           />
@@ -174,18 +174,18 @@ const Signup = () => {
               label="Role"
               value={role}
               onChange={(e) => setRole(e.target.value as string)}
-              color="success"
+             
             >
-              <MenuItem value={"USER"}>USER</MenuItem>
-              <MenuItem value={"ADMIN"}>ADMIN</MenuItem>
+              <MenuItem value={"STUDENT"}>STUDENT</MenuItem>
+              <MenuItem value={"TEACHER"}>TEACHER</MenuItem>
             </Select>
           </FormControl>
           <Button
             variant="contained"
-            style={{ width: "50%", backgroundColor: "#36cc00" }}
+            style={{ width: "30%",borderRadius: 17 }}
             type="submit"
           >
-            SignUp
+            Register
           </Button>
         </Card>
       </form>
