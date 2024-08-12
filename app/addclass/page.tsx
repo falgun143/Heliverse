@@ -38,9 +38,16 @@ const CreateClassRoom = () => {
     try {
       const response = await axios.get("/api/getusers");
 
-
-      setTeachers(  response.data.users.filter((user: any) => user.role === "TEACHER").map((user:any)=>user.email));
-      setAllStudents(response.data.users.filter((user: any) => user.role === "STUDENT").map((user:any)=>user.email));
+      setTeachers(
+        response.data.users
+          .filter((user: any) => user.role === "TEACHER")
+          .map((user: any) => user.email)
+      );
+      setAllStudents(
+        response.data.users
+          .filter((user: any) => user.role === "STUDENT")
+          .map((user: any) => user.email)
+      );
     } catch (error) {
       console.error("Failed to fetch users:", error);
     }
@@ -61,13 +68,13 @@ const CreateClassRoom = () => {
     try {
       const token = Cookies.get("token");
       if (process.env.NEXT_PUBLIC_JWT_SECRET && token) {
-        const { id } = decode_jwt(process.env.NEXT_PUBLIC_JWT_SECRET, token);
         await axios.post("/api/addclass", {
           classname,
           startTime: startTime.toISOString(),
           endTime: endTime.toISOString(),
           days: days.join(","),
-          userId: id,
+          teacher: selectedTeacher,
+          students,
         });
         toast.success("Class added successfully");
         toast.success("Redirecting to classes Page....");
@@ -80,7 +87,7 @@ const CreateClassRoom = () => {
     }
   };
 
-  if (!login || role !== "PRINCIPAL") {
+  if (!login || role != "PRINCIPAL") {
     return (
       <Box
         sx={{
@@ -115,7 +122,7 @@ const CreateClassRoom = () => {
           display: "flex",
           flexDirection: "column",
           alignItems: "center",
-          marginTop: 4,
+          marginTop: 1,
         }}
       >
         <Typography variant="h4" sx={{ mb: 2 }}>
@@ -146,7 +153,7 @@ const CreateClassRoom = () => {
             />
             <Autocomplete
               options={teachers}
-              getOptionLabel={(option) => option} 
+              getOptionLabel={(option) => option}
               value={selectedTeacher}
               onChange={(event, newValue) => setSelectedTeacher(newValue)}
               renderInput={(params) => (
@@ -159,7 +166,7 @@ const CreateClassRoom = () => {
             <Autocomplete
               multiple
               options={allStudents}
-              getOptionLabel={(option) => option} 
+              getOptionLabel={(option) => option}
               value={students}
               onChange={(event, newValue) => setStudents(newValue)}
               renderInput={(params) => (

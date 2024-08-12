@@ -100,9 +100,15 @@ const Login = () => {
         setLogin(true);
         setrole(role);
         toast.success("Login Successful, redirecting...");
-        setTimeout(() => {
-          router.push("/getusers");
-        }, 1500);
+        if(role=="PRINCIPAL"){
+          setTimeout(() => {
+            router.push("/getusers");
+          }, 1500);
+        }
+        else if(role=="USER"){
+          
+        }
+     
       }
     } catch (error: any) {
       if (error.response) {

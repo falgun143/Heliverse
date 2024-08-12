@@ -37,7 +37,7 @@ const Users = () => {
   const [editUser, setEditUser] = useState({id:"",email: "", password: "" });
   const [loading, setLoading] = useState(true);
   const [errors, setErrors] = useState<{ path: string; message: string }[]>([]);
-  const { login } = useLogin();
+  const { login , role } = useLogin();
 
   useEffect(() => {
     if (login) {
@@ -171,6 +171,9 @@ const Users = () => {
         </Button>
       </Box>
     );
+  }
+  if(role!="PRINCIPAL"){
+    
   }
 
   
